@@ -58,6 +58,15 @@ body::before {
   background: radial-gradient(ellipse, rgba(109, 75, 210, .14), transparent 60%);
 }
 
+.address-dialog-glow {
+  position: absolute;
+  inset: -55% -30% auto;
+  height: 70%;
+  pointer-events: none;
+  background: radial-gradient(ellipse, rgba(124, 92, 246, .18), transparent 65%);
+  filter: blur(12px);
+}
+
 @keyframes breathe {
   0%, 100% { opacity: .7; transform: translateX(-50%) scale(.96); }
   50% { opacity: 1; transform: translateX(-50%) scale(1.04); }

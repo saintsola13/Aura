@@ -1,6 +1,6 @@
 # AURA
 
-A production-oriented foundation for a wallet-native digital identity product, built as a pnpm/Turborepo monorepo and deployed entirely on Cloudflare.
+A production-oriented foundation for a public-address digital identity product, built as a pnpm/Turborepo monorepo and deployed entirely on Cloudflare.
 
 ## Stack
 
@@ -13,10 +13,11 @@ A production-oriented foundation for a wallet-native digital identity product, b
 ## Repository layout
 
 ```text
-apps/web        Next.js landing page and wallet client
+apps/web        Next.js landing page and public-address entry client
 apps/api        Hono Worker, D1 migrations, and R2 integration
 packages/ui     Shared React primitives
 packages/shared Shared domain models and validation helpers
+docs            Product white paper and long-form documentation
 ```
 
 ## Local development
@@ -32,9 +33,11 @@ pnpm dev
 
 The web app runs at `http://localhost:3000`; Wrangler normally starts the API at `http://localhost:8787`. `pnpm typecheck` and `pnpm build` verify all workspaces.
 
-## Wallet authentication
+## Wallet identification and safety
 
-The web package includes an EIP-1193 connection scaffold and responds to account changes. Connecting a wallet is not authentication by itself. Before protecting profile mutations, add a nonce endpoint, require an EIP-4361 (Sign-In with Ethereum) signature, verify it in the Worker, and issue a short-lived secure session. The current profile write routes are intentionally scaffolding and must not be treated as authorization-protected.
+AURA identifies profiles only by a manually pasted public Ethereum address. The normalized address is stored in the browser's local storage and can be changed or removed at any time. AURA does not connect to wallet software and never requests seed phrases, private keys, wallet permissions, transaction approvals, or message signatures.
+
+Public-address identification is not proof of wallet ownership. The current profile write routes are scaffolding and must not be treated as authorization-protected; use an appropriate non-wallet account authentication system before enabling user mutations in production.
 
 ## Cloudflare setup
 

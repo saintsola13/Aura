@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "AURA — Own your digital presence",
-  description: "A calm, trusted home for your onchain identity.",
+  description: "A calm social layer for exploring public onchain profiles.",
 };
 
 export const viewport: Viewport = { colorScheme: "dark", themeColor: "#070708" };
