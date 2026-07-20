@@ -1,0 +1,25 @@
+{
+  "name": "@aura/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "deploy": "wrangler deploy",
+    "db:migrate:local": "wrangler d1 migrations apply aura-db --local",
+    "db:migrate:remote": "wrangler d1 migrations apply aura-db --remote",
+    "cf-typegen": "wrangler types"
+  },
+  "dependencies": {
+    "@aura/shared": "workspace:*",
+    "hono": "4.12.31"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260719.1",
+    "typescript": "5.8.3",
+    "wrangler": "4.112.0"
+  }
+}
