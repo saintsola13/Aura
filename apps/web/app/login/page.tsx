@@ -15,6 +15,7 @@ function LoginContent() {
   const redirect = params.get("redirect")?.startsWith("/")
     ? params.get("redirect")!
     : "/home";
+  const xEnabled = process.env.NEXT_PUBLIC_X_AUTH_ENABLED === "true";
   async function submit(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -53,12 +54,21 @@ function LoginContent() {
         <p className="mt-2 text-sm text-zinc-500">
           A secure account for your place in NFT culture.
         </p>
-        <a
-          href={`${API_URL}/v1/auth/x/start?redirect=${encodeURIComponent(redirect)}`}
-          className="mt-8 flex h-12 items-center justify-center rounded-full bg-white font-medium text-black"
-        >
-          Continue with X
-        </a>
+        {xEnabled ? (
+          <a
+            href={`${API_URL}/v1/auth/x/start?redirect=${encodeURIComponent(redirect)}`}
+            className="mt-8 flex h-12 items-center justify-center rounded-full bg-white font-medium text-black"
+          >
+            Continue with X
+          </a>
+        ) : (
+          <div
+            className="mt-8 flex h-12 items-center justify-center rounded-full border border-white/[.08] text-sm text-zinc-600"
+            aria-disabled="true"
+          >
+            Continue with X · unavailable in preview
+          </div>
+        )}
         <div className="my-7 flex items-center gap-3 text-xs text-zinc-700">
           <span className="h-px flex-1 bg-white/[.08]" />
           or
@@ -105,4 +115,16 @@ function LoginContent() {
     </main>
   );
 }
-export default function LoginPage(){return <Suspense fallback={<main className="grid min-h-screen place-items-center text-zinc-500">Loading secure sign-in…</main>}><LoginContent/></Suspense>}
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="grid min-h-screen place-items-center text-zinc-500">
+          Loading secure sign-in…
+        </main>
+      }
+    >
+      <LoginContent />
+    </Suspense>
+  );
+}

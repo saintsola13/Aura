@@ -107,7 +107,7 @@ export const rejectsDevelopmentIdentityHeader = (
 
 const cookieOptions = (c: AuraContext, httpOnly: boolean) => ({
   httpOnly,
-  secure: c.env.ENVIRONMENT === "production",
+  secure: c.env.ENVIRONMENT !== "development",
   sameSite: "Lax" as const,
   path: "/",
   maxAge: Math.floor(AUTH_TIMING.sessionIdleMs / 1000),

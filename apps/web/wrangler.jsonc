@@ -1,9 +1,29 @@
 {
   "$schema": "../../node_modules/wrangler/config-schema.json",
   "name": "aura-web",
-  "main": ".open-next/worker.js",
+  "main": "worker.ts",
   "compatibility_date": "2026-07-19",
   "compatibility_flags": ["nodejs_compat"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "observability": { "enabled": true },
+  "env": {
+    "preview": {
+      "name": "aura-web-preview",
+      "vars": {
+        "AURA_API_ORIGIN": "https://aura-api-preview.saintsola13.workers.dev",
+      },
+      "r2_buckets": [
+        {
+          "binding": "NEXT_INC_CACHE_R2_BUCKET",
+          "bucket_name": "aura-web-cache-preview",
+        },
+      ],
+      "services": [
+        {
+          "binding": "AURA_API",
+          "service": "aura-api-preview",
+        },
+      ],
+    },
+  },
 }

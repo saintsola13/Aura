@@ -47,4 +47,46 @@
     },
   ],
   "triggers": { "crons": ["0 3 * * *"] },
+  "env": {
+    "preview": {
+      "name": "aura-api-preview",
+      "vars": {
+        "ENVIRONMENT": "preview",
+        "APP_ORIGIN": "https://aura-web-preview.saintsola13.workers.dev",
+        "CORS_ORIGINS": "https://aura-web-preview.saintsola13.workers.dev",
+        "X_REDIRECT_URI": "https://aura-api-preview.saintsola13.workers.dev/v1/auth/x/callback",
+        "AUTH_EMAIL_FROM": "AURA <auth@saintwatch.com>",
+        "TURNSTILE_EXPECTED_HOSTNAME": "",
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "aura-preview",
+          "database_id": "1aff34a0-15d4-46fc-80db-d2a98b1e3717",
+          "migrations_dir": "migrations",
+        },
+      ],
+      "r2_buckets": [
+        { "binding": "AVATARS", "bucket_name": "aura-media-preview" },
+      ],
+      "ratelimits": [
+        {
+          "name": "AUTH_RATE_LIMITER",
+          "namespace_id": "1101",
+          "simple": { "limit": 10, "period": 60 },
+        },
+        {
+          "name": "MUTATION_RATE_LIMITER",
+          "namespace_id": "1102",
+          "simple": { "limit": 120, "period": 60 },
+        },
+        {
+          "name": "SEARCH_RATE_LIMITER",
+          "namespace_id": "1103",
+          "simple": { "limit": 60, "period": 60 },
+        },
+      ],
+      "triggers": { "crons": ["0 3 * * *"] },
+    },
+  },
 }

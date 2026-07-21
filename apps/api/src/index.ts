@@ -17,6 +17,7 @@ import {
   normalizeEmail,
   privateRateLimitKey,
   safeRedirect,
+  validateMutationOrigin,
   type CreatePostInput,
   type FeedPost,
   type ImageMimeType,
@@ -282,7 +283,7 @@ async function storeApprovedImage(
   await c.env.AVATARS.put(pendingKey, bytes, {
     httpMetadata: { contentType: type, cacheControl: "private, no-store" },
   });
-  if (c.env.ENVIRONMENT === "production" && !c.env.MEDIA_SCANNER) {
+  if (c.env.ENVIRONMENT !== "development" && !c.env.MEDIA_SCANNER) {
     await c.env.AVATARS.delete(pendingKey);
     return false;
   }
@@ -414,6 +415,20 @@ app.use("/v1/*", async (c, next) => {
     credentials: true,
     maxAge: 86400,
   })(c, next);
+});
+app.use("/v1/*", async (c, next) => {
+  if (!["GET", "HEAD", "OPTIONS"].includes(c.req.method)) {
+    const origin = c.req.header("Origin") ?? null;
+    if (!validateMutationOrigin(origin, c.env.APP_ORIGIN)) {
+      return error(
+        c,
+        403,
+        "INVALID_ORIGIN",
+        "The request origin was rejected.",
+      );
+    }
+  }
+  await next();
 });
 
 app.get("/", (c) => c.json({ name: "AURA API", version: "v1" }));
@@ -565,7 +580,7 @@ async function uploadProfileAsset(c: AppContext, kind: "avatar" | "banner") {
       c,
       415,
       "IMAGE_REJECTED",
-      c.env.ENVIRONMENT === "production"
+      c.env.ENVIRONMENT !== "development"
         ? "Media scanning is unavailable. Try again later."
         : "The file contents do not match the selected image type.",
     );
@@ -795,7 +810,7 @@ app.post("/v1/posts", async (c) => {
         c,
         415,
         "IMAGE_REJECTED",
-        c.env.ENVIRONMENT === "production"
+        c.env.ENVIRONMENT !== "development"
           ? "Media scanning is unavailable. Try again later."
           : "The image was rejected.",
       );
