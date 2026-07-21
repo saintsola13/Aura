@@ -4,12 +4,47 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-07-19",
   "compatibility_flags": ["nodejs_compat"],
-  "observability": { "enabled": true },
-  "vars": { "ENVIRONMENT": "production", "CORS_ORIGINS": "http://localhost:3000" },
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "vars": {
+    "ENVIRONMENT": "production",
+    "APP_ORIGIN": "https://<AURA_WEB_DOMAIN>",
+    "CORS_ORIGINS": "https://<AURA_WEB_DOMAIN>",
+    "X_REDIRECT_URI": "https://<AURA_API_DOMAIN>/v1/auth/x/callback",
+    "AUTH_EMAIL_FROM": "AURA <sign-in@<VERIFIED_EMAIL_DOMAIN>>",
+    "TURNSTILE_EXPECTED_HOSTNAME": "<AURA_WEB_DOMAIN>",
+  },
   "d1_databases": [
-    { "binding": "DB", "database_name": "aura-db", "database_id": "REPLACE_WITH_D1_DATABASE_ID", "migrations_dir": "migrations" }
+    {
+      "binding": "DB",
+      "database_name": "aura-db",
+      "database_id": "<PRODUCTION_D1_DATABASE_ID>",
+      "preview_database_id": "<PREVIEW_D1_DATABASE_ID>",
+      "migrations_dir": "migrations",
+    },
   ],
   "r2_buckets": [
-    { "binding": "AVATARS", "bucket_name": "aura-avatars", "preview_bucket_name": "aura-avatars-dev" }
-  ]
+    {
+      "binding": "AVATARS",
+      "bucket_name": "replace-with-production-r2-bucket",
+      "preview_bucket_name": "replace-with-preview-r2-bucket",
+    },
+  ],
+  "ratelimits": [
+    {
+      "name": "AUTH_RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": { "limit": 10, "period": 60 },
+    },
+    {
+      "name": "MUTATION_RATE_LIMITER",
+      "namespace_id": "1002",
+      "simple": { "limit": 120, "period": 60 },
+    },
+    {
+      "name": "SEARCH_RATE_LIMITER",
+      "namespace_id": "1003",
+      "simple": { "limit": 60, "period": 60 },
+    },
+  ],
+  "triggers": { "crons": ["0 3 * * *"] },
 }

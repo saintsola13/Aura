@@ -1,2 +1,60 @@
-"use client";import{SocialShell}from"@/components/site-chrome";import{Composer}from"@/components/social/composer";import{FeedList,FeedSkeleton}from"@/components/social/feed-list";import{PostCard}from"@/components/social/post-card";import{api}from"@/lib/api";import type{FeedPost}from"@aura/shared";import{useParams,useRouter}from"next/navigation";import{useEffect,useState}from"react";
-export default function PostPage(){const{id}=useParams<{id:string}>();const router=useRouter();const[post,setPost]=useState<FeedPost|null>(null);const[error,setError]=useState("");const[rev,setRev]=useState(0);useEffect(()=>{api<{data:FeedPost}>(`/v1/posts/${id}`).then(r=>setPost(r.data)).catch(e=>setError(e instanceof Error?e.message:"Post unavailable."))},[id]);return <SocialShell><header className="border-b border-white/[.07] px-5 py-4"><button onClick={()=>router.back()} className="mr-4 text-zinc-500" aria-label="Go back">←</button><span className="font-medium">Post</span></header>{error?<p className="p-12 text-center text-sm text-red-300">{error}</p>:post?<><PostCard post={post} onDeleted={()=>router.push("/home")}/><Composer compact replyToPostId={post.id} context={`Replying to @${post.author.username}`} onPosted={()=>setRev(v=>v+1)}/><div className="px-5 py-4 text-xs uppercase tracking-[.18em] text-zinc-600">Comments</div><FeedList endpoint={`/v1/posts/${id}/comments`} revision={rev} empty="No comments yet. Start the conversation."/></>:<FeedSkeleton/>}</SocialShell>}
+"use client";
+import { SocialShell } from "@/components/site-chrome";
+import { Composer } from "@/components/social/composer";
+import { FeedList, FeedSkeleton } from "@/components/social/feed-list";
+import { PostCard } from "@/components/social/post-card";
+import { api } from "@/lib/api";
+import type { FeedPost } from "@aura/shared";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+export default function PostPage() {
+  const { id } = useParams<{ id: string }>();
+  const router = useRouter();
+  const [post, setPost] = useState<FeedPost | null>(null);
+  const [error, setError] = useState("");
+  const [rev, setRev] = useState(0);
+  useEffect(() => {
+    api<{ data: FeedPost }>(`/v1/posts/${id}`)
+      .then((r) => setPost(r.data))
+      .catch((e) =>
+        setError(e instanceof Error ? e.message : "Post unavailable."),
+      );
+  }, [id]);
+  return (
+    <SocialShell>
+      <header className="border-b border-white/[.07] px-5 py-4">
+        <button
+          onClick={() => router.back()}
+          className="mr-4 text-zinc-500"
+          aria-label="Go back"
+        >
+          ←
+        </button>
+        <span className="font-medium">Post</span>
+      </header>
+      {error ? (
+        <p className="p-12 text-center text-sm text-red-300">{error}</p>
+      ) : post ? (
+        <>
+          <PostCard post={post} onDeleted={() => router.push("/home")} />
+          <Composer
+            compact
+            replyToPostId={post.id}
+            context={`Replying to @${post.author.username}`}
+            onPosted={() => setRev((v) => v + 1)}
+          />
+          <div className="px-5 py-4 text-xs uppercase tracking-[.18em] text-zinc-600">
+            Comments
+          </div>
+          <FeedList
+            endpoint={`/v1/posts/${id}/comments`}
+            revision={rev}
+            empty="No comments yet. Start the conversation."
+          />
+        </>
+      ) : (
+        <FeedSkeleton />
+      )}
+    </SocialShell>
+  );
+}

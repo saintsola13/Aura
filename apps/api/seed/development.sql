@@ -8,6 +8,9 @@ INSERT OR IGNORE INTO users (id, username, display_name, bio, location, website_
 ('usr_sage', 'sage_archive', 'Sage Archive', 'Documenting the beautiful, strange history of internet-native art.', 'London', 'https://example.com/sage', '0x5555555555555555555555555555555555555555', 0, '2026-07-05T14:00:00.000Z', '2026-07-05T14:00:00.000Z'),
 ('usr_kite', 'kite_social', 'Kite Social', 'Community builder. Better rituals, kinder networks, useful gatherings.', 'Los Angeles, CA', 'https://example.com/kite', '0x6666666666666666666666666666666666666666', 0, '2026-07-06T14:00:00.000Z', '2026-07-06T14:00:00.000Z');
 
+INSERT OR IGNORE INTO accounts (id,primary_email,email_verified_at,status,role,created_at,updated_at) SELECT 'acct_'||id, NULL, NULL, 'active', 'user', created_at, updated_at FROM users WHERE id LIKE 'usr_%';
+UPDATE users SET account_id='acct_'||id WHERE id LIKE 'usr_%' AND account_id IS NULL;
+
 INSERT OR IGNORE INTO follows (follower_user_id, followed_user_id, created_at) VALUES
 ('usr_mira','usr_orbit','2026-07-08T10:00:00.000Z'), ('usr_mira','usr_nova','2026-07-08T10:01:00.000Z'),
 ('usr_orbit','usr_mira','2026-07-08T10:02:00.000Z'), ('usr_orbit','usr_lex','2026-07-08T10:03:00.000Z'),
@@ -52,3 +55,13 @@ INSERT OR IGNORE INTO notifications (id,recipient_user_id,actor_user_id,type,pos
 ('ntf_03','usr_orbit','usr_mira','like','post_02','2026-07-18T18:00:00.000Z','2026-07-18T17:31:00.000Z'),
 ('ntf_04','usr_nova','usr_sage','repost','post_22',NULL,'2026-07-18T16:00:00.000Z'),
 ('ntf_05','usr_mira','usr_kite','follow',NULL,NULL,'2026-07-08T10:10:00.000Z');
+
+INSERT OR IGNORE INTO auth_identities (id,account_id,provider,provider_subject,provider_email,provider_email_verified) VALUES
+('identity_mira_email','acct_usr_mira','email','mira@aura.test','mira@aura.test',1),
+('identity_orbit_email','acct_usr_orbit','email','orbit@aura.test','orbit@aura.test',1),
+('identity_lex_email','acct_usr_lex','email','lex@aura.test','lex@aura.test',1),
+('identity_nova_email','acct_usr_nova','email','nova@aura.test','nova@aura.test',1),
+('identity_sage_email','acct_usr_sage','email','sage@aura.test','sage@aura.test',1),
+('identity_kite_email','acct_usr_kite','email','kite@aura.test','kite@aura.test',1);
+
+UPDATE accounts SET primary_email = replace(substr(id, 10), 'usr_', '') || '@aura.test', email_verified_at = coalesce(email_verified_at, strftime('%Y-%m-%dT%H:%M:%fZ','now')) WHERE id LIKE 'acct_usr_%' AND primary_email IS NULL;

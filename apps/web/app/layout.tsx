@@ -10,12 +10,19 @@ export const metadata: Metadata = {
   description: "A calm social layer for exploring public onchain profiles.",
 };
 
-export const viewport: Viewport = { colorScheme: "dark", themeColor: "#070708" };
+export const viewport: Viewport = {
+  colorScheme: "dark",
+  themeColor: "#070708",
+};
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className="dark">
-      <body className={inter.variable}><SessionProvider>{children}</SessionProvider></body>
+      <body className={inter.variable}>
+        <SessionProvider>{children}</SessionProvider>
+      </body>
     </html>
   );
 }

@@ -6,6 +6,14 @@ Version 1.0 — July 2026
 
 This white paper describes AURA's product vision, intended operating boundaries, known limitations, major risks, and directional roadmap. It is an explanatory product document, not a contract, investment document, offer, guarantee, or complete legal disclosure.
 
+## Phase 4 product status
+
+AURA supports passwordless email magic links, Continue with X through OAuth 2.0 with PKCE, opaque server-side sessions, provider linking, session revocation, centralized authorization, Turnstile, distributed Cloudflare rate limits, moderation states, and a 30-day account-deletion grace period. Email links are consumed only after an explicit confirmation POST; X access tokens are not retained. Production resource provisioning, sender and domain verification, X application configuration, qualified legal review, and an external media-scanning service remain launch requirements.
+
+Wallet addresses remain manually entered public profile references. They are unverified and never used for authentication, authorization, recovery, signing, transactions, custody, or ownership proof.
+
+See the [Terms](legal/TERMS.md), [Privacy Policy](legal/PRIVACY.md), [Community Guidelines](legal/COMMUNITY-GUIDELINES.md), [Copyright Policy](legal/COPYRIGHT.md), and [Acceptable Use Policy](legal/ACCEPTABLE-USE.md).
+
 ## Phase 3 product status
 
 Phase 3 introduces editable profiles, public profile pages, follows, chronological following and explore feeds, text and one-image posts, replies, likes, reposts, mentions, and readable notifications. Media is stored through the configured R2 binding; social records and relationships are stored in D1.

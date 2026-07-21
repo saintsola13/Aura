@@ -1,4 +1,113 @@
 "use client";
-import { Avatar,SocialShell } from"@/components/site-chrome";import{api,relativeTime}from"@/lib/api";import type{Notification}from"@aura/shared";import Link from"next/link";import{useEffect,useState}from"react";
-const action={follow:"followed you",like:"liked your post",comment:"commented on your post",repost:"reposted your post",mention:"mentioned you"};
-export default function NotificationsPage(){const[items,setItems]=useState<Notification[]>([]);const[loading,setLoading]=useState(true);const[error,setError]=useState("");async function load(){setLoading(true);try{const r=await api<{data:Notification[]}>("/v1/notifications");setItems(r.data);}catch(e){setError(e instanceof Error?e.message:"Unable to load notifications.");}finally{setLoading(false)}}useEffect(()=>{void load()},[]);async function read(id:string){await api(`/v1/notifications/${id}/read`,{method:"POST"});setItems(v=>v.map(n=>n.id===id?{...n,readAt:new Date().toISOString()}:n));}async function readAll(){await api("/v1/notifications/read-all",{method:"POST"});setItems(v=>v.map(n=>({...n,readAt:n.readAt??new Date().toISOString()})));}return <SocialShell><header className="flex items-center justify-between border-b border-white/[.07] px-5 py-4"><h1 className="font-medium">Notifications</h1><button onClick={readAll} className="text-xs text-violet-300">Mark all read</button></header>{loading?<div className="p-12 text-center text-sm text-zinc-600">Loading…</div>:error?<div className="p-12 text-center text-sm text-red-300">{error}</div>:!items.length?<div className="p-16 text-center"><p className="text-sm text-zinc-500">All quiet for now.</p><p className="mt-2 text-xs text-zinc-700">Follows and post activity will appear here.</p></div>:items.map(n=><article key={n.id} className={`flex gap-3 border-b border-white/[.07] p-5 ${n.readAt?"":"bg-violet-400/[.035]"}`}><Avatar user={n.actor}/><div className="min-w-0 flex-1"><p className="text-sm"><Link href={`/profile/${n.actor.username}`} className="font-medium">{n.actor.displayName}</Link> <span className="text-zinc-500">{action[n.type]}</span></p>{n.post&&<Link href={`/post/${n.post.id}`} className="mt-2 block truncate rounded-lg border border-white/[.06] p-3 text-xs text-zinc-500">{n.post.body||"Media post"}</Link>}<span className="mt-2 block text-xs text-zinc-700">{relativeTime(n.createdAt)}</span></div>{!n.readAt&&<button onClick={()=>read(n.id)} className="h-8 rounded-full border border-white/10 px-3 text-[10px] text-zinc-400" aria-label="Mark notification as read">Mark read</button>}</article>)}</SocialShell>}
+import { Avatar, SocialShell } from "@/components/site-chrome";
+import { AuthGate } from "@/components/auth-gate";
+import { api, relativeTime } from "@/lib/api";
+import type { Notification } from "@aura/shared";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+const action = {
+  follow: "followed you",
+  like: "liked your post",
+  comment: "commented on your post",
+  repost: "reposted your post",
+  mention: "mentioned you",
+};
+export default function NotificationsPage() {
+  const [items, setItems] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  async function load() {
+    setLoading(true);
+    try {
+      const r = await api<{ data: Notification[] }>("/v1/notifications");
+      setItems(r.data);
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : "Unable to load notifications.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => {
+    void load();
+  }, []);
+  async function read(id: string) {
+    await api(`/v1/notifications/${id}/read`, { method: "POST" });
+    setItems((v) =>
+      v.map((n) =>
+        n.id === id ? { ...n, readAt: new Date().toISOString() } : n,
+      ),
+    );
+  }
+  async function readAll() {
+    await api("/v1/notifications/read-all", { method: "POST" });
+    setItems((v) =>
+      v.map((n) => ({ ...n, readAt: n.readAt ?? new Date().toISOString() })),
+    );
+  }
+  return (
+    <AuthGate>
+      <SocialShell>
+        <header className="flex items-center justify-between border-b border-white/[.07] px-5 py-4">
+          <h1 className="font-medium">Notifications</h1>
+          <button onClick={readAll} className="text-xs text-violet-300">
+            Mark all read
+          </button>
+        </header>
+        {loading ? (
+          <div className="p-12 text-center text-sm text-zinc-600">Loading…</div>
+        ) : error ? (
+          <div className="p-12 text-center text-sm text-red-300">{error}</div>
+        ) : !items.length ? (
+          <div className="p-16 text-center">
+            <p className="text-sm text-zinc-500">All quiet for now.</p>
+            <p className="mt-2 text-xs text-zinc-700">
+              Follows and post activity will appear here.
+            </p>
+          </div>
+        ) : (
+          items.map((n) => (
+            <article
+              key={n.id}
+              className={`flex gap-3 border-b border-white/[.07] p-5 ${n.readAt ? "" : "bg-violet-400/[.035]"}`}
+            >
+              <Avatar user={n.actor} />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm">
+                  <Link
+                    href={`/profile/${n.actor.username}`}
+                    className="font-medium"
+                  >
+                    {n.actor.displayName}
+                  </Link>{" "}
+                  <span className="text-zinc-500">{action[n.type]}</span>
+                </p>
+                {n.post && (
+                  <Link
+                    href={`/post/${n.post.id}`}
+                    className="mt-2 block truncate rounded-lg border border-white/[.06] p-3 text-xs text-zinc-500"
+                  >
+                    {n.post.body || "Media post"}
+                  </Link>
+                )}
+                <span className="mt-2 block text-xs text-zinc-700">
+                  {relativeTime(n.createdAt)}
+                </span>
+              </div>
+              {!n.readAt && (
+                <button
+                  onClick={() => read(n.id)}
+                  className="h-8 rounded-full border border-white/10 px-3 text-[10px] text-zinc-400"
+                  aria-label="Mark notification as read"
+                >
+                  Mark read
+                </button>
+              )}
+            </article>
+          ))
+        )}
+      </SocialShell>
+    </AuthGate>
+  );
+}

@@ -1,10 +1,16 @@
 @import "tailwindcss";
 @source "../../../packages/ui/src";
 
-:root { color-scheme: dark; }
+:root {
+  color-scheme: dark;
+}
 
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
 body {
   margin: 0;
   background: #070708;
@@ -19,7 +25,7 @@ body::before {
   inset: 0;
   pointer-events: none;
   z-index: 50;
-  opacity: .025;
+  opacity: 0.025;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E");
 }
 
@@ -27,8 +33,16 @@ body::before {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #fff 0 4%, #a78bfa 24%, #5b21b6 55%, transparent 57%), radial-gradient(circle, #8b5cf6, transparent 68%);
-  box-shadow: 0 0 22px rgba(139, 92, 246, .5);
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      #fff 0 4%,
+      #a78bfa 24%,
+      #5b21b6 55%,
+      transparent 57%
+    ),
+    radial-gradient(circle, #8b5cf6, transparent 68%);
+  box-shadow: 0 0 22px rgba(139, 92, 246, 0.5);
 }
 
 .text-gradient {
@@ -46,7 +60,12 @@ body::before {
   aspect-ratio: 1;
   transform: translateX(-50%);
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(110, 78, 210, .22) 0, rgba(68, 45, 150, .08) 38%, transparent 68%);
+  background: radial-gradient(
+    circle,
+    rgba(110, 78, 210, 0.22) 0,
+    rgba(68, 45, 150, 0.08) 38%,
+    transparent 68%
+  );
   filter: blur(14px);
   animation: breathe 7s ease-in-out infinite;
 }
@@ -55,7 +74,11 @@ body::before {
   position: absolute;
   inset: -100% 0 auto;
   height: 180%;
-  background: radial-gradient(ellipse, rgba(109, 75, 210, .14), transparent 60%);
+  background: radial-gradient(
+    ellipse,
+    rgba(109, 75, 210, 0.14),
+    transparent 60%
+  );
 }
 
 .address-dialog-glow {
@@ -63,16 +86,31 @@ body::before {
   inset: -55% -30% auto;
   height: 70%;
   pointer-events: none;
-  background: radial-gradient(ellipse, rgba(124, 92, 246, .18), transparent 65%);
+  background: radial-gradient(
+    ellipse,
+    rgba(124, 92, 246, 0.18),
+    transparent 65%
+  );
   filter: blur(12px);
 }
 
 @keyframes breathe {
-  0%, 100% { opacity: .7; transform: translateX(-50%) scale(.96); }
-  50% { opacity: 1; transform: translateX(-50%) scale(1.04); }
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: translateX(-50%) scale(0.96);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.04);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  .orb { animation: none; }
+  html {
+    scroll-behavior: auto;
+  }
+  .orb {
+    animation: none;
+  }
 }

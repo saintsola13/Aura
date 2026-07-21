@@ -1,119 +1,102 @@
 # AURA
 
-A production-oriented foundation for a public-address digital identity product, built as a pnpm/Turborepo monorepo and deployed entirely on Cloudflare.
+AURA is a premium social platform for NFT culture, built as a pnpm/Turborepo monorepo on Next.js 15, Hono, Cloudflare Workers, D1, R2, and OpenNext.
 
-## Phase 3
+## Phase 4
 
-AURA now provides a functional development social experience for NFT culture and internet-native communities:
+Production identity is an AURA account—not a wallet. Accounts support passwordless email magic links and Continue with X (OAuth 2.0 Authorization Code with PKCE), multiple linked methods, hashed opaque server sessions, CSRF/origin protection, session revocation, moderation states, and delayed deletion. Public wallet addresses remain manually entered, unverified profile references and are never used for authentication, recovery, authorization, signing, transactions, or custody.
 
-- editable and public profiles with avatar/banner media;
-- manual, unverified public wallet-address references;
-- follows, follower/following lists, and chronological following feeds;
-- text posts, one-image posts, replies, reposts, likes, and mentions;
-- recent-post explore, people search, post detail, and notifications;
-- responsive desktop and mobile navigation; and
-- deterministic demo data plus shared domain validation tests.
+The social product includes public/editable profiles, follows, chronological feeds, text and single-image posts, replies, reposts, likes, mentions, notifications, search, and mobile navigation.
 
-## Stack
-
-- Next.js 15, React 19, TypeScript, Tailwind CSS 4, and the App Router
-- Hono REST API on Cloudflare Workers
-- Cloudflare D1 for profiles and R2 for avatar objects
-- OpenNext for deploying Next.js to Cloudflare Workers
-- Shared UI and domain contracts through workspace packages
-
-## Repository layout
+## Repository
 
 ```text
-apps/web        Next.js landing page and public-address entry client
-apps/api        Hono Worker, D1 migrations, and R2 integration
-packages/ui     Shared React primitives
-packages/shared Shared domain models and validation helpers
-docs            Product white paper and long-form documentation
+apps/web          Next.js App Router web application
+apps/api          Hono Cloudflare Worker, migrations, and seed
+packages/ui       Shared React primitives
+packages/shared   Domain/auth types, validation, and security primitives
+docs/legal        Initial operational legal drafts
 ```
 
 ## Local development
 
-Prerequisites: Node.js 20+ and pnpm 10.
+Prerequisites: Node.js 20+, pnpm 10, and Wrangler authentication for remote work.
 
 ```bash
-cp .env.example .env.local
+cp .env.example apps/web/.env.local
+cp .dev.vars.example apps/api/.dev.vars
 pnpm install
 pnpm --filter @aura/api db:migrate:local
 pnpm --filter @aura/api db:seed:local
 pnpm dev
 ```
 
-The web app runs at `http://localhost:3000`; Wrangler normally starts the API at `http://localhost:8787`. Open `/home`, select a visibly labeled Development session user, and use the seeded social graph. Run `pnpm typecheck`, `pnpm lint`, `pnpm test`, and `pnpm build` to verify all workspaces.
+Use Cloudflare's published Turnstile test keys locally. Automated tests mock email and X; they never send email or call live X APIs. The legacy `X-Aura-Dev-User` path is off by default, cannot run in production, is absent from normal web behavior, and may be enabled only for deliberate local diagnostics with `ENABLE_DEV_AUTH=1`.
 
-### Resetting local D1
+To reset local D1, stop Wrangler, remove only `apps/api/.wrangler/state`, then rerun migration and seed commands. The seed preserves six fictional profiles and their Phase 3 posts, follows, likes, replies, reposts, and notifications, and migration 0003 creates corresponding AURA accounts.
 
-Wrangler stores local state under `apps/api/.wrangler/state`. To reset, stop local processes, remove that local-only directory, then rerun the migration and seed commands above. The seed is idempotent and creates six fictional users, 22 posts (including comments and reposts), 12 follow relationships, 12 likes, and five notifications.
+## Authentication design
 
-## Development session model
+- Sessions contain 256 bits of random entropy. Only a SHA-256/pepper hash is stored in D1; the raw value exists only in an HttpOnly, SameSite=Lax cookie (Secure in production).
+- Idle expiration is 14 days, rolls at most daily, and never exceeds the 30-day absolute lifetime. Sensitive changes require a session created within 15 minutes.
+- Magic links expire after 15 minutes, are stored hashed, consumed atomically once, and land on a confirmation page whose explicit POST establishes the session. The request response is enumeration-resistant.
+- X transactions expire after 10 minutes, use random hashed state and S256 PKCE. AURA requests only `tweet.read users.read`, keys identity by X subject ID, and discards the provider access token after reading the basic identity.
+- Linking requires a recent AURA session. Identity conflicts never auto-merge accounts. The final verified sign-in method cannot be removed.
+- Cookie mutations require an exact trusted Origin and a double-submit CSRF value matched to its D1 hash. Account ID comes only from the authenticated session.
 
-Phase 3 intentionally does not pretend wallet lookup is authentication. The development user switcher stores a selected demo user ID in local storage and sends it as `X-Aura-Dev-User`. The API validates the ID against D1 only when `ENVIRONMENT` is not `production`. In production, mutation requests using this temporary mechanism are rejected.
+## Abuse and media controls
 
-This is not secure authentication and must not be exposed as one. The API isolates session resolution from domain operations so a real cookie/token-backed, non-wallet session can replace it later. Production authentication, CSRF strategy, distributed rate limiting, abuse operations, and authorization review remain required before enabling production mutations.
+Cloudflare Rate Limiting bindings provide shared limits: anonymous authentication 10/minute, authenticated mutations/uploads 120/minute, and search 60/minute. Keys are derived from a secret-peppered network, account, or normalized-email value; raw emails and IPs are not rate keys. Responses use a stable `RATE_LIMITED` error and `Retry-After`.
 
-## Wallet identification and safety
+Turnstile is verified server-side for email login and email changes, including hostname and action when configured. Uploads allow JPEG, PNG, and WebP, enforce 5 MB avatars/8 MB banners and posts, verify magic bytes, block SVG/executable content, use safe generated names, and enter an R2 `pending/` prefix. Production fails closed unless `MEDIA_SCANNER` is bound and approves the file. Metadata stripping and malware scanning depend on that external implementation and are not claimed complete.
 
-AURA identifies profiles only by a manually pasted public Ethereum address. The normalized address is stored in the browser's local storage and can be changed or removed at any time. AURA does not connect to wallet software and never requests seed phrases, private keys, wallet permissions, transaction approvals, or message signatures.
+## API
 
-Public-address identification is not proof of wallet ownership. Phase 3 mutations are available only through the temporary non-production development session; use an appropriate non-wallet account authentication system before enabling user mutations in production.
+Health: `GET /health`, `GET /ready`.
 
-## D1 migrations and R2 media
+Authentication: `GET /v1/auth/session`, `POST /v1/auth/logout`, `POST /v1/auth/logout-all`, `GET /v1/auth/sessions`, `DELETE /v1/auth/sessions/:id`, `POST /v1/auth/email/request`, `POST /v1/auth/email/consume`, `GET /v1/auth/x/start`, `GET /v1/auth/x/callback`, `GET /v1/auth/x/link/start`, `GET /v1/auth/x/link/callback`, `DELETE /v1/auth/x/link`, `POST /v1/auth/email/change/request`, and `POST /v1/auth/email/change/confirm`.
 
-- `0001_initial.sql` creates the original profile foundation.
-- `0002_social_graph.sql` rebuilds the profile model and adds posts, follows, likes, notifications, foreign keys, constraints, and feed indexes.
-- `seed/development.sql` supplies deterministic local demo content and is not an automatic production migration.
+Account: `POST /v1/account/delete/request`, `POST /v1/account/delete/cancel`. A daily Cron permanently anonymizes/deletes due AURA data after a 30-day cancellation period; it cannot delete public blockchain data.
 
-Avatar uploads are limited to 5 MB. Banners and post images are limited to 8 MB. Only JPEG, PNG, and WebP are accepted. Objects use generated user-scoped keys, retain content types and cache metadata, replace prior profile assets cleanly, and are served through `GET /v1/media/*`. Failed post creation removes an uploaded object; deleting a post removes its media object.
+Social: profile, follow, post, media, like, comment, repost, feed, explore, search, and notification routes under `/v1`. All mutations use prepared statements and centralized account/session authorization.
 
-## Cloudflare setup
+## Cloudflare production provisioning
 
-Authenticate Wrangler, then create the backing resources:
+Create distinct production/preview D1 and R2 resources, replace the explicit `<...>` placeholders in `apps/api/wrangler.jsonc`, configure Worker routes/custom domains, create Turnstile, verify the Resend sending domain, register the X OAuth callback, and bind an authenticated media scanner service.
 
 ```bash
-wrangler login
 wrangler d1 create aura-db
-wrangler r2 bucket create aura-avatars
-wrangler r2 bucket create aura-avatars-dev
-```
-
-Copy the returned D1 ID into `apps/api/wrangler.jsonc`, then apply and deploy:
-
-```bash
+wrangler d1 create aura-db-preview
+wrangler r2 bucket create aura-media
+wrangler r2 bucket create aura-media-preview
 pnpm --filter @aura/api db:migrate:remote
+pnpm --filter @aura/api db:seed:local
+wrangler secret put SESSION_TOKEN_PEPPER --config apps/api/wrangler.jsonc
+wrangler secret put RESEND_API_KEY --config apps/api/wrangler.jsonc
+wrangler secret put X_CLIENT_ID --config apps/api/wrangler.jsonc
+wrangler secret put X_CLIENT_SECRET --config apps/api/wrangler.jsonc
+wrangler secret put TURNSTILE_SECRET_KEY --config apps/api/wrangler.jsonc
 pnpm --filter @aura/api deploy
 pnpm --filter @aura/web deploy
 ```
 
-Set `NEXT_PUBLIC_API_URL` for the web build to the deployed API URL, and update `CORS_ORIGINS` in the API Worker to the production web origin. For CI deployment, store `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` as repository secrets.
+Set non-secret `APP_ORIGIN`, `CORS_ORIGINS`, `X_REDIRECT_URI`, `AUTH_EMAIL_FROM`, optional `AUTH_EMAIL_REPLY_TO`, `TURNSTILE_EXPECTED_HOSTNAME`, `NEXT_PUBLIC_API_URL`, and `NEXT_PUBLIC_TURNSTILE_SITE_KEY`. Never commit real credentials.
 
-## API
+After deployment: check `/health` and `/ready`; request and consume a real magic link; complete and unlink/relink X; verify cookies and CSRF rejection; create/revoke sessions; exercise a social mutation; upload a safe image through the scanner; confirm 429 behavior, logs/request IDs, Cron configuration, CORS/CSP, legal links, deletion cancellation, and alerting. Cloudflare Observability is enabled; configure Logpush/alerts and retention before launch. Logs contain request ID, route, status, latency, safe account ID, and security event—not tokens, codes, secrets, raw emails, or raw IPs.
 
-- `GET /health`
-- `GET /v1/dev/users` (development only)
-- `GET /v1/profiles/:username`
-- `PUT /v1/me/profile`
-- `POST|DELETE /v1/me/avatar`
-- `POST|DELETE /v1/me/banner`
-- `GET /v1/users/search?q=`
-- `POST|DELETE /v1/profiles/:username/follow`
-- `GET /v1/profiles/:username/followers`
-- `GET /v1/profiles/:username/following`
-- `POST /v1/posts`
-- `GET|DELETE /v1/posts/:id`
-- `GET /v1/profiles/:username/posts`
-- `GET /v1/feed`
-- `GET /v1/explore`
-- `POST|DELETE /v1/posts/:id/like`
-- `POST|GET /v1/posts/:id/comments`
-- `POST|DELETE /v1/posts/:id/repost`
-- `GET /v1/notifications`
-- `POST /v1/notifications/read-all`
-- `POST /v1/notifications/:id/read`
-- `GET /v1/media/*`
+## Verification
 
-All SQL inputs use prepared D1 statements. User post text is rendered as text, never HTML. CORS is allowlisted, secure headers are enabled, images are byte- and MIME-limited, and mutation categories pass through a development-friendly isolate-local rate-limit abstraction. Production should replace that abstraction with Cloudflare's distributed Rate Limiting or Durable Objects and complete a formal threat/abuse review.
+```bash
+pnpm install
+pnpm typecheck
+pnpm lint
+pnpm test
+pnpm build
+pnpm --filter @aura/api exec wrangler deploy --dry-run
+pnpm --filter @aura/web exec opennextjs-cloudflare build
+git diff --check
+```
+
+## Launch limitations
+
+The documents in `docs/legal` are initial operational drafts and require qualified counsel, including governing-law, contact, designated-agent, child/privacy, consumer, and liability decisions. Production also requires real Cloudflare IDs/domains, secrets, Resend and X approvals, a media scanner/metadata transformer, security monitoring and incident response, deletion/export operations, moderation/appeals staffing, accessibility review, and an independent security/privacy assessment.

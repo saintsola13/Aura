@@ -1,1 +1,7 @@
-"use client";import{UserListPage}from"@/components/social/user-list";import{useParams}from"next/navigation";export default function Page(){const p=useParams<{username:string}>();return <UserListPage username={p.username} direction="followers"/>}
+"use client";
+import { UserListPage } from "@/components/social/user-list";
+import { useParams } from "next/navigation";
+export default function Page() {
+  const p = useParams<{ username: string }>();
+  return <UserListPage username={p.username} direction="followers" />;
+}

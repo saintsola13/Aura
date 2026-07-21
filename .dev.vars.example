@@ -1,0 +1,14 @@
+ENVIRONMENT=development
+APP_ORIGIN=http://localhost:3000
+CORS_ORIGINS=http://localhost:3000
+SESSION_TOKEN_PEPPER=generate-at-least-32-random-bytes
+RESEND_API_KEY=re_test_key
+AUTH_EMAIL_FROM=AURA <onboarding@resend.dev>
+AUTH_EMAIL_REPLY_TO=
+X_CLIENT_ID=your-local-x-client-id
+X_CLIENT_SECRET=
+X_REDIRECT_URI=http://localhost:8787/v1/auth/x/callback
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+TURNSTILE_EXPECTED_HOSTNAME=localhost
+MEDIA_SCAN_MODE=basic
+ENABLE_DEV_AUTH=0

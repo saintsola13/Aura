@@ -7,7 +7,8 @@ import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 const STORAGE_KEY = "aura.public-wallet-address";
 const ADDRESS_EVENT = "aura:wallet-address-change";
 
-const shortAddress = (address: string) => `${address.slice(0, 6)}…${address.slice(-4)}`;
+const shortAddress = (address: string) =>
+  `${address.slice(0, 6)}…${address.slice(-4)}`;
 
 function readStoredAddress(): string {
   const value = localStorage.getItem(STORAGE_KEY) ?? "";
@@ -79,7 +80,10 @@ export function WalletAddress() {
       </Button>
 
       {open && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="presentation">
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+          role="presentation"
+        >
           <button
             className="absolute inset-0 cursor-default bg-black/70 backdrop-blur-md"
             onClick={() => setOpen(false)}
@@ -95,8 +99,13 @@ export function WalletAddress() {
             <div className="relative">
               <div className="mb-6 flex items-start justify-between gap-4">
                 <div>
-                  <p className="mb-2 text-[11px] font-medium uppercase tracking-[.2em] text-violet-300">Public address only</p>
-                  <h2 id={`${inputId}-title`} className="text-2xl font-medium tracking-[-.035em]">
+                  <p className="mb-2 text-[11px] font-medium uppercase tracking-[.2em] text-violet-300">
+                    Public address only
+                  </p>
+                  <h2
+                    id={`${inputId}-title`}
+                    className="text-2xl font-medium tracking-[-.035em]"
+                  >
                     {address ? "Manage wallet" : "Enter your wallet"}
                   </h2>
                 </div>
@@ -111,11 +120,17 @@ export function WalletAddress() {
               </div>
 
               <p className="mb-5 text-sm leading-6 text-zinc-400">
-                Paste a public Ethereum address to identify your profile. AURA never connects to your wallet or requests access.
+                Paste a public Ethereum address to identify your profile. AURA
+                never connects to your wallet or requests access.
               </p>
 
               <form onSubmit={save} noValidate>
-                <label htmlFor={inputId} className="mb-2 block text-xs font-medium text-zinc-300">Ethereum address</label>
+                <label
+                  htmlFor={inputId}
+                  className="mb-2 block text-xs font-medium text-zinc-300"
+                >
+                  Ethereum address
+                </label>
                 <input
                   ref={inputRef}
                   id={inputId}
@@ -133,19 +148,30 @@ export function WalletAddress() {
                   aria-describedby={`${inputId}-help`}
                   className="h-12 w-full rounded-xl border border-white/10 bg-black/30 px-4 font-mono text-sm text-white outline-none transition placeholder:text-zinc-700 focus:border-violet-400/60 focus:ring-4 focus:ring-violet-500/10 aria-[invalid=true]:border-red-400/60"
                 />
-                <div id={`${inputId}-help`} className={`mt-2 min-h-5 text-xs ${error ? "text-red-300" : "text-zinc-600"}`} aria-live="polite">
+                <div
+                  id={`${inputId}-help`}
+                  className={`mt-2 min-h-5 text-xs ${error ? "text-red-300" : "text-zinc-600"}`}
+                  aria-live="polite"
+                >
                   {error || "40 hexadecimal characters, beginning with 0x."}
                 </div>
 
                 <div className="mt-5 flex gap-3">
-                  <Button type="submit" className="flex-1">{address ? "Save changes" : "Save address"}</Button>
-                  {address && <Button type="button" variant="secondary" onClick={remove}>Remove</Button>}
+                  <Button type="submit" className="flex-1">
+                    {address ? "Save changes" : "Save address"}
+                  </Button>
+                  {address && (
+                    <Button type="button" variant="secondary" onClick={remove}>
+                      Remove
+                    </Button>
+                  )}
                 </div>
               </form>
 
               <div className="mt-5 flex items-start gap-2.5 border-t border-white/[.07] pt-5 text-xs leading-5 text-zinc-600">
                 <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400/80" />
-                No wallet permissions, private keys, seed phrases, signatures, or transactions—ever.
+                No wallet permissions, private keys, seed phrases, signatures,
+                or transactions—ever.
               </div>
             </div>
           </section>
