@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { SessionProvider } from "@/components/social/session-provider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -14,7 +15,7 @@ export const viewport: Viewport = { colorScheme: "dark", themeColor: "#070708" }
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className="dark">
-      <body className={inter.variable}>{children}</body>
+      <body className={inter.variable}><SessionProvider>{children}</SessionProvider></body>
     </html>
   );
 }

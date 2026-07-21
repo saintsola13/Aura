@@ -4,6 +4,6 @@
   "private": true,
   "type": "module",
   "exports": { ".": "./src/index.ts" },
-  "scripts": { "build": "tsc --noEmit", "typecheck": "tsc --noEmit", "lint": "tsc --noEmit" },
-  "devDependencies": { "typescript": "5.8.3" }
+  "scripts": { "build": "tsc --noEmit", "typecheck": "tsc --noEmit", "lint": "tsc --noEmit", "test": "vitest run" },
+  "devDependencies": { "typescript": "5.8.3", "vitest": "3.2.4" }
 }

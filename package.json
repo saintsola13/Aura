@@ -9,6 +9,7 @@
     "dev": "turbo dev",
     "typecheck": "turbo typecheck",
     "lint": "turbo lint",
+    "test": "turbo test",
     "deploy": "turbo deploy",
     "format": "prettier --write ."
   },

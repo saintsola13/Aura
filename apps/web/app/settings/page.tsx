@@ -1,5 +1,5 @@
 import { WalletAddress } from "@/components/wallet-address";
-import { SiteFooter, SiteHeader } from "@/components/site-chrome";
+import { SocialShell } from "@/components/site-chrome";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -10,8 +10,7 @@ export const metadata: Metadata = {
 
 export default function SettingsPage() {
   return (
-    <main className="min-h-screen">
-      <SiteHeader />
+    <SocialShell>
       <div className="mx-auto max-w-3xl px-6 py-20 lg:px-8">
         <p className="text-xs font-medium uppercase tracking-[.22em] text-violet-300">Preferences</p>
         <h1 className="mt-4 text-4xl font-medium tracking-[-.045em] sm:text-5xl">Settings</h1>
@@ -46,7 +45,6 @@ export default function SettingsPage() {
           AURA accepts public addresses for profile lookup only. It does not verify control of an address, connect to wallet software, or enable transactions.
         </aside>
       </div>
-      <SiteFooter />
-    </main>
+    </SocialShell>
   );
 }

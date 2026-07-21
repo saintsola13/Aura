@@ -1,4 +1,4 @@
-import { SiteFooter, SiteHeader } from "@/components/site-chrome";
+import { SocialShell } from "@/components/site-chrome";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -9,6 +9,10 @@ export const metadata: Metadata = {
 
 const sections = [
   {
+    title: "Phase 3 product status",
+    body: <>AURA now includes editable and public profiles, follows, chronological feeds, posts, one-image media, replies, likes, reposts, mentions, and notifications. These features currently use a clearly labeled development-only user switcher. The development header is temporary and is rejected by the production Worker; production authentication is not complete. Wallet addresses remain manually entered, public, unverified profile references and are never used as authentication.</>,
+  },
+  {
     title: "1. What AURA is",
     body: <>AURA is a social discovery and presentation layer for public Ethereum addresses. People can manually enter any public address to view and organize public profile and NFT information associated with that address. AURA is designed as a calm interface for expression, discovery, and community context. An address shown in AURA is a lookup value, not a verified identity or proof that the person entering it controls that address.</>,
   },
@@ -18,7 +22,7 @@ const sections = [
   },
   {
     title: "3. Manual public-address policy",
-    body: <>AURA only accepts an Ethereum address that a person manually copies and pastes. The browser validates the format as <code>0x</code> followed by 40 hexadecimal characters, normalizes it, and saves it locally on that device. AURA does not connect to injected providers or wallet applications and does not request wallet permissions, signatures, seed phrases, private keys, transaction approvals, or cryptographic challenges.</>,
+    body: <>AURA only accepts an Ethereum address that a person manually copies and pastes. The browser validates the format as <code>0x</code> followed by 40 hexadecimal characters, normalizes it, and saves it locally on that device. AURA does not use browser-extension or wallet-application connection interfaces and does not request wallet permissions, signatures, seed phrases, private keys, transaction approvals, or cryptographic challenges.</>,
   },
   {
     title: "4. What AURA does not do",
@@ -72,8 +76,7 @@ const sections = [
 
 export default function WhitePaperPage() {
   return (
-    <main className="min-h-screen">
-      <SiteHeader />
+    <SocialShell>
       <article className="mx-auto max-w-3xl px-6 py-20 lg:px-8">
         <div className="border-b border-white/[.08] pb-12">
           <p className="text-xs font-medium uppercase tracking-[.22em] text-violet-300">WP · Version 1.0 · July 2026</p>
@@ -93,7 +96,6 @@ export default function WhitePaperPage() {
           ))}
         </div>
       </article>
-      <SiteFooter />
-    </main>
+    </SocialShell>
   );
 }

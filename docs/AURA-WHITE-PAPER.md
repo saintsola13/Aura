@@ -6,6 +6,14 @@ Version 1.0 — July 2026
 
 This white paper describes AURA's product vision, intended operating boundaries, known limitations, major risks, and directional roadmap. It is an explanatory product document, not a contract, investment document, offer, guarantee, or complete legal disclosure.
 
+## Phase 3 product status
+
+Phase 3 introduces editable profiles, public profile pages, follows, chronological following and explore feeds, text and one-image posts, replies, likes, reposts, mentions, and readable notifications. Media is stored through the configured R2 binding; social records and relationships are stored in D1.
+
+The current interactive product uses a visibly labeled **Development session** user switcher. It stores a selected demo user ID locally and sends it in `X-Aura-Dev-User`. This mechanism is temporary, is not secure authentication, and is accepted only when the API environment is not production. The production Worker rejects mutation requests that rely on it. A real non-wallet session system is still required before production social mutations can be enabled.
+
+Wallet references remain manual only. AURA does not connect to wallet software. Any public wallet address displayed on a profile was manually entered, is not verified, and is never evidence that the profile editor controls the address.
+
 ## 1. What AURA is
 
 AURA is a social discovery and presentation layer for information associated with public Ethereum addresses. It is intended to make public profiles, NFT collections, creative context, and community participation easier to explore and organize through a calm, human-centered interface.
@@ -38,7 +46,7 @@ The user copies and pastes a public address. The client validates the format as 
 
 AURA does not request or use:
 
-- injected providers or wallet-connection protocols;
+- browser-extension or wallet-application connection interfaces;
 - wallet permissions or account lists;
 - seed or recovery phrases;
 - private keys;
